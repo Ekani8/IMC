@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+	<html lang="fi">
+	<head>
+		<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/css/bootstrap.min.css">
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/js/bootstrap.min.js"></script>
+	</head>
+	<body>
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-lg-3 col-sm-4 col-lg-offset-4 col-sm-offset-4">
+					<div class="page-header"><h1>H.I <small><i class="glyphicon glyphicon-heart-empty"></i><small></h1></div>
+					<form class="form-horizontal">
+						<div class="form-group">
+							<div class="col-xs-12">
+								<div class="btn-group-justified" data-toggle="buttons">
+								  <label class="btn btn-primary active">
+								    <input type="radio" name="sex" value="f" autocomplete="off" checked> Femmes
+								  </label>
+								  <label class="btn btn-primary">
+								    <input type="radio" name="sex" value="m" autocomplete="off"> Homme
+								  </label>
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-xs-12">
+								<div class="input-group">
+									<input type="text" name="height" class="form-control" placeholder="Hauteur">
+									<div class="input-group-addon">cm</div>
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-xs-12">
+								<div class="input-group">
+									<input type="text" name="weight" class="form-control" placeholder="Kilo">
+									<div class="input-group-addon">kg</div>
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-xs-12">
+								<div class="input-group">
+									<input type="text" name="age" class="form-control" placeholder="Age">
+									<div class="input-group-addon">v</div>
+								</div>
+							</div>
+						</div>
+					</form>
+					<div class="row">
+						<div class="col-xs-12">
+							<button class="btn btn-success btn-lg btn-block" id="compute" data-toggle="popover" title="Rasvaprosenttisi" data-placement="bottom">
+								<i class="glyphicon glyphicon-ok"></i> Laske
+							</button>
+						</div>
+					</div>
+					<div class="row">
+						<div id="result-box" style="display: none;">
+							<div class="col-xs-6">
+								<h4>Indica de graisse corporelle</h4>
+							</div>
+							<div class="col-xs-6">
+								<h4 id="result" class="pull-right"></h4>
+							</div>
+						</div>
+					</div>
+					<div class="footer">
+						<hr>
+						<p class="pull-right"><a href="#">Hi Inc.</a></p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script type="text/javascript">
+			function comp(w,h,a,s) {
+				h = h / 100.0;
+				if (s == "m")
+					p = 0.01 * w * (0.14*a + 37.31 * Math.log(w / Math.pow(h, 2.0)) - 103.94);
+				else
+					p = 0.01 * w * (0.14*a + 39.96 * Math.log(w / Math.pow(h, 2.0)) - 102.01);
+				return p;
+			}
+			function isInt(n) {
+				if (! n) return false;
+				return n % 1 === 0;
+			}
+			$("#compute").on("click", function() {
+				var fs = {
+					w: {
+						sel: "[name='weight']",
+						v: isInt
+					},
+					h: {
+						sel: "[name='height']",
+						v: isInt
+					},
+					a: {
+						sel: "[name='age']",
+						v: isInt
+					},
+					s: {
+						sel: "[name='sex']:checked",
+						v: function(x) { return true; }
+					}},
+					err = false,
+					val, func, sel;
+				$("#result-box").hide()
+				
+				// validate
+				for (var f in fs) {
+			    	if (fs.hasOwnProperty(f)) {
+				    	sel = fs[f].sel;
+				    	vf = fs[f].v;
+					    val = $(sel).val();
+						if (! vf(val)) {
+							$(sel).parent().addClass("has-error");
+							err = true;
+						} else {
+							$(sel).parent().removeClass("has-error");
+							fs[f].val = val;
+						}
+					}
+				}
+				if (err) return;
+				s = Math.round(comp(fs.w.val, fs.h.val, fs.a.val, fs.s.val), 1) + " %";
+			//	$.post("http://domain.com/fat/", { "fat": s});
+				$("#result-box").fadeIn(450);
+				$("#result").text(s);
+			});
+		</script>
+	</body>
+</html>
